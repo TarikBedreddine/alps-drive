@@ -1,9 +1,14 @@
 //server
 
-const http = require('http');
+const root = require('./drive');
 const app = require('./server');
 
-app.set('port', process.env.PORT || 3000);
-const server = http.createServer(app);
+root.createRootFolder();
 
-server.listen(process.env.PORT || 3000);
+
+app.listen(process.env.PORT || 3000, (error) => {
+    console.log(error)
+});
+
+
+
