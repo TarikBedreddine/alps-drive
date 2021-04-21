@@ -14,9 +14,9 @@ function createRootFolder() {
     return promise
 }
 
-function listFolder() {
+function listFolder(path = alpsDriveRoot) {
     // Le paramètre withFileTypes permet de retourner un tableau avec des Objets et non pas un tableau avec des Strings
-    const promise = fs.readdir(alpsDriveRoot, {withFileTypes: true})
+    const promise = fs.readdir(path, {withFileTypes: true})
     // Important de faire un return à cet endroit et NON pas à la fin
     return promise.then((results) => {
         // Tableau à peupler
@@ -25,7 +25,7 @@ function listFolder() {
         results.forEach((oneResult) => {
             allData.push({
                 name: oneResult.name,
-                isDirectory: oneResult.isDirectory()
+                isFolder: oneResult.isDirectory()
             })
         })
         return allData;
@@ -34,18 +34,39 @@ function listFolder() {
     })
 }
 
-function displayFile() {
-    if (req.name.isDirectory) {
-        console.log("dossier!!!!!!!!!!!")
-    } else {
-        const promise = fs.readFile(alpsDriveRoot + '/' + req.name)
-        return promise
-    }
+function displayFile(name) {
+    const filePath = path.join(alpsDriveRoot, name)
+    const statFile = fs.stat(filePath)
+    return statFile.then((result) => {
+            if (result.isFile()) {
+                return fs.readFile(filePath, "utf8")
+            } else {
+                return listFolder(filePath).then((result) => {
+                    console.log(result)
+                })
+            }
+        }
+    )
 }
-
 
 module.exports = {
     createRootFolder: createRootFolder,
     listFolder: listFolder,
     displayFile: displayFile
 };
+
+
+/*
+const promise = fs.readdir(filePath, {withFileTypes: true})
+return promise.then((results) => {
+    const allData = [];
+    results.forEach((oneResult) => {
+        allData.push({
+            name: oneResult.name,
+            isFolder: oneResult.isDirectory()
+        })
+    })
+    return allData;
+}).catch(() => {
+    console.log("error")
+})*/

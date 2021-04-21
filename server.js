@@ -3,13 +3,18 @@ const fs = require('fs/promises');
 const drive = require('./drive')
 const express = require('express');
 
+// Permet de réutiliser la fonction listFolder
+const path = require('path');
+const os = require('os');
+const alpsDriveRoot = path.join(os.tmpdir(), "api", "drive");
+
 const app = express();
 app.use(express.static('frontend'));
 
 module.exports = app;
 
 
-app.use('/api/drive', (req, res) => {
+app.get('/api/drive', (req, res) => {
     drive.listFolder()
         // On récupère le module listFolder et on récupère le résultat de la promesse
         .then(function (result) {
@@ -23,8 +28,9 @@ app.use('/api/drive', (req, res) => {
 })
 
 app.get('/api/drive/:name', (req, res) => {
-    drive.displayFile().then((result) => {
-        console.log(result)
+    const name = req.params.name
+    drive.displayFile(name).then((result) => {
+        res.send(result)
     })
 })
 
