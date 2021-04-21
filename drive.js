@@ -54,19 +54,3 @@ module.exports = {
     listFolder: listFolder,
     displayFile: displayFile
 };
-
-
-/*
-const promise = fs.readdir(filePath, {withFileTypes: true})
-return promise.then((results) => {
-    const allData = [];
-    results.forEach((oneResult) => {
-        allData.push({
-            name: oneResult.name,
-            isFolder: oneResult.isDirectory()
-        })
-    })
-    return allData;
-}).catch(() => {
-    console.log("error")
-})*/
