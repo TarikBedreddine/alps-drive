@@ -3,11 +3,6 @@ const fs = require('fs/promises');
 const drive = require('./drive')
 const express = require('express');
 
-// Permet de réutiliser la fonction listFolder
-const path = require('path');
-const os = require('os');
-const alpsDriveRoot = path.join(os.tmpdir(), "api", "drive");
-
 const app = express();
 app.use(express.static('frontend'));
 
@@ -33,6 +28,14 @@ app.get('/api/drive/:name', (req, res) => {
         res.send(result)
     }).catch(() => {
         res.status(404)
+    })
+})
+
+
+app.post("/api/drive", (req, res) => {
+    const name = req.query.name
+    drive.createFolder(name).then((result) => {
+        res.send(result)
     })
 })
 
