@@ -33,9 +33,12 @@ app.get('/api/drive/:name', (req, res) => {
 
 
 app.post("/api/drive", (req, res) => {
-    const regex = /[a-zA-Z0-9-]/g;
+    const regex = /^[a-zA-Z0-9-]*$/g;
     const name = req.query.name
+    const regexWithName = regex.test(name)
+    console.log(regexWithName)
     if (regex.exec(name)) {
+        console.log(regex.test(name))
         drive.createFolder(name).then((result) => {
             res.send(result)
         }).catch(() => {
