@@ -51,6 +51,7 @@ function displayFile(name) {
     )
 }
 
+
 //Create a folder at Root
 function createFolder (name) {
     const filePath = path.join(alpsDriveRoot, name)
