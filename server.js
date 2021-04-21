@@ -31,6 +31,8 @@ app.get('/api/drive/:name', (req, res) => {
     const name = req.params.name
     drive.displayFile(name).then((result) => {
         res.send(result)
+    }).catch(() => {
+        res.status(404)
     })
 })
 
