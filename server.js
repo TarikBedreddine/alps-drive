@@ -82,11 +82,21 @@ app.delete("/api/drive/:folder/:name?", (req, res) => {
 })
 
 app.put("/api/drive", (req, res) => {
-
     const fileName = req.files.file.filename
     const pathBB = req.files.file.file
 
     drive.uploadFile(pathBB, fileName).then((result) => {
+        res.send(result)
+    })
+})
+
+app.put("/api/drive/:folder", (req, res) => {
+    const folder = req.params.folder
+    const fileName = req.files.file.filename
+    const pathBB = req.files.file.file
+
+    console.log(fileName, folder)
+    drive.uploadFile(pathBB, fileName, folder).then((result) => {
         res.send(result)
     })
 })

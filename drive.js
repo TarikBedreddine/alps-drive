@@ -70,14 +70,14 @@ function createFolderInsideFolder(folder, name) {
 }
 
 function deleteFileOrFolder(name, folder = false) {
-    function isThereFolder(folder) {
+    function isItFolder(folder) {
         if (folder) {
             return path.join(alpsDriveRoot, folder, name)
         } else {
             return path.join(alpsDriveRoot, name)
         }
     }
-    const rightPath = isThereFolder(folder)
+    const rightPath = isItFolder(folder)
     return fs.access(rightPath)
         .then(() => {
             return fs.rm(rightPath, {recursive: true})
@@ -88,11 +88,21 @@ function deleteFileOrFolder(name, folder = false) {
 }
 
 
-function uploadFile(pathBB, nameFile) {
-    const filePath = path.join(alpsDriveRoot, nameFile)
+function uploadFile(pathBB, nameFile, folder = false) {
+    function isItFolder(folder) {
+        if (folder) {
+            console.log("j'ai le folder" + folder)
+            return path.join(alpsDriveRoot, folder, nameFile)
+        } else {
+            console.log("je n'ai pas le folder")
+            return path.join(alpsDriveRoot, nameFile)
+        }
+    }
+    const correctPath = isItFolder(folder)
+    console.log(correctPath)
     return fs.access(pathBB)
         .then(() => {
-            return fs.copyFile(pathBB, filePath)
+            return fs.copyFile(pathBB, correctPath)
         })
         .catch((err) => {
             console.log(err)
