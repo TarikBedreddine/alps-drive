@@ -14,6 +14,7 @@ function createRootFolder() {
         })
     return promise
 }
+
 // List all folders of the Root
 function listFolder(path = alpsDriveRoot) {
     // Le paramètre withFileTypes permet de retourner un tableau avec des Objets et non pas un tableau avec des Strings
@@ -50,7 +51,7 @@ function displayFile(name) {
 }
 
 //Create a folder at Root
-function createFolder (name) {
+function createFolder(name) {
     const filePath = path.join(alpsDriveRoot, name)
     return fs.access(filePath)
         .then(() => console.log("Le dossier existe déjà :("))
@@ -59,21 +60,42 @@ function createFolder (name) {
         })
 }
 
-function createFolderInsideFolder (folder, name) {
+function createFolderInsideFolder(folder, name) {
     const filePath = path.join(alpsDriveRoot, folder, name)
     return fs.access(filePath)
-        .then(() => console.log("File already exist"))
+        .then(() => console.log("Le dossier existe déjà !!!"))
         .catch(() => {
             return fs.mkdir(filePath, {recursive: true})
         })
 }
 
-function deleteFileOrFolder (name) {
-    const filePath = path.join(alpsDriveRoot, name)
-    return fs.access(filePath)
-        .then(() => fs.rm(filePath, {recursive:true}))
+function deleteFileOrFolder(name, folder = false) {
+    function isThereFolder(folder) {
+        if (folder) {
+            return path.join(alpsDriveRoot, folder, name)
+        } else {
+            return path.join(alpsDriveRoot, name)
+        }
+    }
+    const rightPath = isThereFolder(folder)
+    return fs.access(rightPath)
+        .then(() => {
+            return fs.rm(rightPath, {recursive: true})
+        })
         .catch(() => {
-            return console.log("le fichier n'existe pas")
+            return console.log("Erreur, le fichier ne peut pas être supprimé")
+        })
+}
+
+
+function uploadFile(pathBB, nameFile) {
+    const filePath = path.join(alpsDriveRoot, nameFile)
+    return fs.access(pathBB)
+        .then(() => {
+            return fs.copyFile(pathBB, filePath)
+        })
+        .catch((err) => {
+            console.log(err)
         })
 }
 
@@ -85,5 +107,6 @@ module.exports = {
     displayFile: displayFile,
     createFolder: createFolder,
     createFolderInsideFolder: createFolderInsideFolder,
-    deleteFileOrFolder: deleteFileOrFolder
+    deleteFileOrFolder: deleteFileOrFolder,
+    uploadFile: uploadFile
 };

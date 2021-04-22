@@ -1,13 +1,15 @@
 //app
-const fs = require('fs/promises');
 const drive = require('./drive')
 const express = require('express');
+const bb = require('express-busboy')
 
 const app = express();
 app.use(express.static('frontend'));
 
-module.exports = app;
-
+bb.extend(app, {
+    upload: true,
+    path: 'C:/Users/Tarik/AppData/Local/Temp'
+});
 
 app.get('/api/drive', (req, res) => {
     drive.listFolder()
@@ -61,10 +63,33 @@ app.post("/api/drive/:folder/:name?", (req, res) => {
 
 app.delete("/api/drive/:name", (req, res) => {
     const name = req.params.name
-    console.log(name)
     drive.deleteFileOrFolder(name).then((result) => {
         res.send(result)
     }).catch((err) => {
         console.log(err)
     })
 })
+
+app.delete("/api/drive/:folder/:name?", (req, res) => {
+    const folder = req.params.folder
+    const name = req.params.name
+    console.log(folder, name)
+    drive.deleteFileOrFolder(name, folder).then((result) => {
+        res.send(result)
+    }).catch((err) => {
+        console.log(err)
+    })
+})
+
+app.put("/api/drive", (req, res) => {
+
+    const fileName = req.files.file.filename
+    const pathBB = req.files.file.file
+
+    drive.uploadFile(pathBB, fileName).then((result) => {
+        res.send(result)
+    })
+})
+
+
+module.exports = app;
