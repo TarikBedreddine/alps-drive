@@ -43,14 +43,11 @@ function displayFile(name) {
             if (result.isFile()) {
                 return fs.readFile(filePath, "utf8")
             } else {
-                return listFolder(filePath).then((result) => {
-                    console.log(result)
-                })
+                return listFolder(filePath)
             }
         }
     )
 }
-
 
 //Create a folder at Root
 function createFolder (name) {
@@ -62,11 +59,31 @@ function createFolder (name) {
         })
 }
 
+function createFolderInsideFolder (folder, name) {
+    const filePath = path.join(alpsDriveRoot, folder, name)
+    return fs.access(filePath)
+        .then(() => console.log("File already exist"))
+        .catch(() => {
+            return fs.mkdir(filePath, {recursive: true})
+        })
+}
+
+function deleteFileOrFolder (name) {
+    const filePath = path.join(alpsDriveRoot, name)
+    return fs.access(filePath)
+        .then(() => fs.rm(filePath, {recursive:true}))
+        .catch(() => {
+            return console.log("le fichier n'existe pas")
+        })
+}
+
 
 // Export all functions that i need
 module.exports = {
     createRootFolder: createRootFolder,
     listFolder: listFolder,
     displayFile: displayFile,
-    createFolder: createFolder
+    createFolder: createFolder,
+    createFolderInsideFolder: createFolderInsideFolder,
+    deleteFileOrFolder: deleteFileOrFolder
 };

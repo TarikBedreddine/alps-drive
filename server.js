@@ -35,17 +35,36 @@ app.get('/api/drive/:name', (req, res) => {
 app.post("/api/drive", (req, res) => {
     const regex = /^[a-zA-Z0-9-]*$/g;
     const name = req.query.name
-    const regexWithName = regex.test(name)
-    console.log(regexWithName)
-    if (regex.exec(name)) {
-        console.log(regex.test(name))
+    console.log(name)
+    const regexForName = regex.test(name)
+    if (regexForName) {
         drive.createFolder(name).then((result) => {
             res.send(result)
         }).catch(() => {
             res.sendStatus(404)
         })
     } else {
-        //res.redirect(400, "/api/drive")
         res.sendStatus(400)
     }
+})
+
+app.post("/api/drive/:folder/:name?", (req, res) => {
+    const folder = req.params.folder
+    const name = req.query.name
+    drive.createFolderInsideFolder(folder, name).then((result) => {
+        res.send(result)
+    }).catch((err) => {
+        console.log("je passe par la")
+        console.log(err)
+    })
+})
+
+app.delete("/api/drive/:name", (req, res) => {
+    const name = req.params.name
+    console.log(name)
+    drive.deleteFileOrFolder(name).then((result) => {
+        res.send(result)
+    }).catch((err) => {
+        console.log(err)
+    })
 })
