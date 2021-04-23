@@ -1,16 +1,20 @@
-//app
+// REQUIRE ALL NECESSARY FILES & MODULES
 const drive = require('./drive')
 const express = require('express');
 const bb = require('express-busboy')
 
+//
 const app = express();
+// EXPRESS STATIC PERMIT TO SERVE STATIC FILES (WHICH ARE IN FRONTEND FOLDER)
 app.use(express.static('frontend'));
 
+//BUSBODY MODULE, PERMITTED TO UPLOAD FILES
 bb.extend(app, {
     upload: true,
     path: 'C:/Users/Tarik/AppData/Local/Temp'
 });
 
+// THIS ROUTE PERMITED TO LIST ALL FOLDERS AND FILES IN ROOT
 app.get('/api/drive', (req, res) => {
     drive.listFolder()
         // On récupère le module listFolder et on récupère le résultat de la promesse
@@ -24,6 +28,7 @@ app.get('/api/drive', (req, res) => {
         })
 })
 
+// THIS ROUTE DISPLAY THE CONTENT OF A FILE WHEN USER CLICK ON IT
 app.get('/api/drive/:name', (req, res) => {
     const name = req.params.name
     drive.displayFile(name).then((result) => {
@@ -33,11 +38,10 @@ app.get('/api/drive/:name', (req, res) => {
     })
 })
 
-
+// THIS ROUTE CREATE A FOLDER WHEN THE INPUT IS FILLED (+ REGEX SANITIZE)
 app.post("/api/drive", (req, res) => {
     const regex = /^[a-zA-Z0-9-]*$/g;
     const name = req.query.name
-    console.log(name)
     const regexForName = regex.test(name)
     if (regexForName) {
         drive.createFolder(name).then((result) => {
@@ -50,46 +54,69 @@ app.post("/api/drive", (req, res) => {
     }
 })
 
+// THIS ROUTE PERMIT TO CREATE FOLDER INSIDE AN OTHER FOLDER (+ REGEX SANITIZE)
 app.post("/api/drive/:folder/:name?", (req, res) => {
+    const regex = /^[a-zA-Z0-9-]*$/g;
     const folder = req.params.folder
     const name = req.query.name
-    drive.createFolderInsideFolder(folder, name).then((result) => {
-        res.send(result)
-    }).catch((err) => {
-        console.log("je passe par la")
-        console.log(err)
-    })
+    const regexForName = regex.test(name)
+    if (regexForName) {
+        drive.createFolderInsideFolder(folder, name).then((result) => {
+            res.send(result)
+        }).catch((err) => {
+            res.sendStatus(404)
+        })
+    } else {
+        res.sendStatus(400)
+    }
 })
 
+// THIS ROUTE ALLOWS USER TO DELETE A FILE OR A FOLDER
 app.delete("/api/drive/:name", (req, res) => {
+    const regex = /^[a-zA-Z0-9-]*$/g;
     const name = req.params.name
-    drive.deleteFileOrFolder(name).then((result) => {
-        res.send(result)
-    }).catch((err) => {
-        console.log(err)
-    })
+    const regexForName = regex.test(name)
+    if (regexForName) {
+        drive.deleteFileOrFolder(name).then((result) => {
+            res.send(result)
+        }).catch((err) => {
+            console.log(err)
+        })
+    }else {
+        res.sendStatus(400)
+    }
 })
 
+// THIS ROUTE PERMIT TO DELETE A FOLDER OR A FILE WHICH IS INSIDE A FOLDER
 app.delete("/api/drive/:folder/:name?", (req, res) => {
+    const regex = /^[a-zA-Z0-9-]*$/g;
     const folder = req.params.folder
     const name = req.params.name
-    console.log(folder, name)
-    drive.deleteFileOrFolder(name, folder).then((result) => {
-        res.send(result)
-    }).catch((err) => {
-        console.log(err)
-    })
+    const regexForName = regex.test(name)
+    if (regexForName) {
+        drive.deleteFileOrFolder(name, folder).then((result) => {
+            res.send(result)
+        }).catch((err) => {
+            res.sendStatus(404)
+        })
+    } else {
+        res.sendStatus(400)
+    }
 })
 
+// USER CAN A UPLOAD A FILE (TEXT, PNG, JPEG ...) THANKS TO THE LABEL "UPLOAD A NEW FILE"
 app.put("/api/drive", (req, res) => {
     const fileName = req.files.file.filename
     const pathBB = req.files.file.file
 
     drive.uploadFile(pathBB, fileName).then((result) => {
         res.send(result)
+    }).catch(() => {
+        res.sendStatus(400)
     })
 })
 
+// USER CAN UPLOAD A FILE INSIDE A FOLDER
 app.put("/api/drive/:folder", (req, res) => {
     const folder = req.params.folder
     const fileName = req.files.file.filename
@@ -98,8 +125,10 @@ app.put("/api/drive/:folder", (req, res) => {
     console.log(fileName, folder)
     drive.uploadFile(pathBB, fileName, folder).then((result) => {
         res.send(result)
+    }).catch(() => {
+       res.sendStatus(400)
     })
 })
 
-
+// EXPORT THE EXPRESS MODULE
 module.exports = app;

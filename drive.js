@@ -1,11 +1,13 @@
+// REQUIRE ALL NECESSARY FILES & MODULES
 const fs = require('fs/promises');
 const path = require('path');
 const os = require('os');
 
+// PATH OF MY ROOT FOLDER
 const alpsDriveRoot = path.join(os.tmpdir(), "api", "drive");
 console.log(alpsDriveRoot)
 
-//Create an /api/drive folder in tmpdir
+// CREATE AN /API/DRIVE FOLDER IN TMPDIR
 function createRootFolder() {
     const promise = fs.access(alpsDriveRoot)
         .then(() => console.log("Le dossier existe déjà"))
@@ -15,13 +17,11 @@ function createRootFolder() {
     return promise
 }
 
-// List all folders of the Root
+// LIST ALL FOLDERS OF THE ROOT
 function listFolder(path = alpsDriveRoot) {
     // Le paramètre withFileTypes permet de retourner un tableau avec des Objets et non pas un tableau avec des Strings
     const promise = fs.readdir(path, {withFileTypes: true})
-    // Important de faire un return à cet endroit et NON pas à la fin
     return promise.then((results) => {
-        // Tableau à peupler
         const allData = [];
         // Pour chaque objet du tableau, on crée un autre objet avec 2 key (name et isDirectory)
         results.forEach((oneResult) => {
@@ -36,7 +36,7 @@ function listFolder(path = alpsDriveRoot) {
     })
 }
 
-//Display content if it's file or list folder
+// DISPLAY CONTENT IF IT'S FILE OR LIST FOLDER
 function displayFile(name) {
     const filePath = path.join(alpsDriveRoot, name)
     const statFile = fs.stat(filePath)
@@ -50,7 +50,7 @@ function displayFile(name) {
     )
 }
 
-//Create a folder at Root
+// CREATE A FOLDER AT ROOT
 function createFolder(name) {
     const filePath = path.join(alpsDriveRoot, name)
     return fs.access(filePath)
@@ -60,6 +60,7 @@ function createFolder(name) {
         })
 }
 
+// FUNCTION TO CREATE A FOLDER INSIDE AN OTHER FOLDER
 function createFolderInsideFolder(folder, name) {
     const filePath = path.join(alpsDriveRoot, folder, name)
     return fs.access(filePath)
@@ -69,6 +70,7 @@ function createFolderInsideFolder(folder, name) {
         })
 }
 
+// FUNCTION TO DELETE FILE OR A FOLDER
 function deleteFileOrFolder(name, folder = false) {
     function isItFolder(folder) {
         if (folder) {
@@ -77,24 +79,22 @@ function deleteFileOrFolder(name, folder = false) {
             return path.join(alpsDriveRoot, name)
         }
     }
-    const rightPath = isItFolder(folder)
-    return fs.access(rightPath)
+    const correctPath = isItFolder(folder)
+    return fs.access(correctPath)
         .then(() => {
-            return fs.rm(rightPath, {recursive: true})
+            return fs.rm(correctPath, {recursive: true})
         })
         .catch(() => {
             return console.log("Erreur, le fichier ne peut pas être supprimé")
         })
 }
 
-
+// UPLOAD A FILE. IF ANY FOLDER IS RECEIVED THE PATH IS DIFFERENT
 function uploadFile(pathBB, nameFile, folder = false) {
     function isItFolder(folder) {
         if (folder) {
-            console.log("j'ai le folder" + folder)
             return path.join(alpsDriveRoot, folder, nameFile)
         } else {
-            console.log("je n'ai pas le folder")
             return path.join(alpsDriveRoot, nameFile)
         }
     }
