@@ -29,8 +29,8 @@ app.get('/api/drive', (req, res) => {
 })
 
 // THIS ROUTE DISPLAY THE CONTENT OF A FILE WHEN USER CLICK ON IT
-app.get('/api/drive/:name', (req, res) => {
-    const name = req.params.name
+app.get('/api/drive/*', (req, res) => {
+    const name = req.params[0]
     drive.displayFile(name).then((result) => {
         res.send(result)
     }).catch(() => {
@@ -40,7 +40,7 @@ app.get('/api/drive/:name', (req, res) => {
 
 // THIS ROUTE CREATE A FOLDER WHEN THE INPUT IS FILLED (+ REGEX SANITIZE)
 app.post("/api/drive", (req, res) => {
-    const regex = /^[a-zA-Z0-9-]*$/g;
+    const regex = /^[a-zA-Z0-9-.]*$/g;
     const name = req.query.name
     const regexForName = regex.test(name)
     if (regexForName) {
@@ -55,15 +55,15 @@ app.post("/api/drive", (req, res) => {
 })
 
 // THIS ROUTE PERMIT TO CREATE FOLDER INSIDE AN OTHER FOLDER (+ REGEX SANITIZE)
-app.post("/api/drive/:folder/:name?", (req, res) => {
-    const regex = /^[a-zA-Z0-9-]*$/g;
-    const folder = req.params.folder
+app.post("/api/drive/*/:name?", (req, res) => {
+    const regex = /^[a-zA-Z0-9-.]*$/g;
+    const folder = req.params[0]
     const name = req.query.name
     const regexForName = regex.test(name)
     if (regexForName) {
         drive.createFolderInsideFolder(folder, name).then((result) => {
             res.send(result)
-        }).catch((err) => {
+        }).catch(() => {
             res.sendStatus(404)
         })
     } else {
@@ -73,7 +73,7 @@ app.post("/api/drive/:folder/:name?", (req, res) => {
 
 // THIS ROUTE ALLOWS USER TO DELETE A FILE OR A FOLDER
 app.delete("/api/drive/:name", (req, res) => {
-    const regex = /^[a-zA-Z0-9-]*$/g;
+    const regex = /^[a-zA-Z0-9-.]*$/g;
     const name = req.params.name
     const regexForName = regex.test(name)
     if (regexForName) {
@@ -88,10 +88,11 @@ app.delete("/api/drive/:name", (req, res) => {
 })
 
 // THIS ROUTE PERMIT TO DELETE A FOLDER OR A FILE WHICH IS INSIDE A FOLDER
-app.delete("/api/drive/:folder/:name?", (req, res) => {
-    const regex = /^[a-zA-Z0-9-]*$/g;
-    const folder = req.params.folder
+app.delete("/api/drive/*/:name", (req, res) => {
+    const regex = /^[a-zA-Z0-9-.]*$/g;
+    const folder = req.params[0]
     const name = req.params.name
+    console.log(folder, name)
     const regexForName = regex.test(name)
     if (regexForName) {
         drive.deleteFileOrFolder(name, folder).then((result) => {
@@ -117,8 +118,8 @@ app.put("/api/drive", (req, res) => {
 })
 
 // USER CAN UPLOAD A FILE INSIDE A FOLDER
-app.put("/api/drive/:folder", (req, res) => {
-    const folder = req.params.folder
+app.put("/api/drive/*", (req, res) => {
+    const folder = req.params[0]
     const fileName = req.files.file.filename
     const pathBB = req.files.file.file
 

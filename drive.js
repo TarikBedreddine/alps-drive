@@ -9,12 +9,11 @@ console.log(alpsDriveRoot)
 
 // CREATE AN /API/DRIVE FOLDER IN TMPDIR
 function createRootFolder() {
-    const promise = fs.access(alpsDriveRoot)
+    return fs.access(alpsDriveRoot)
         .then(() => console.log("Le dossier existe déjà"))
         .catch(() => {
             return fs.mkdir(alpsDriveRoot, {recursive: true})
         })
-    return promise
 }
 
 // LIST ALL FOLDERS OF THE ROOT
@@ -38,6 +37,7 @@ function listFolder(path = alpsDriveRoot) {
 
 // DISPLAY CONTENT IF IT'S FILE OR LIST FOLDER
 function displayFile(name) {
+    //const filePath = path.join(alpsDriveRoot, name)
     const filePath = path.join(alpsDriveRoot, name)
     const statFile = fs.stat(filePath)
     return statFile.then((result) => {
@@ -47,7 +47,7 @@ function displayFile(name) {
                 return listFolder(filePath)
             }
         }
-    )
+    ).catch((err) => {console.log(err)})
 }
 
 // CREATE A FOLDER AT ROOT
