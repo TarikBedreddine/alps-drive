@@ -19,15 +19,13 @@ bb.extend(app, {
 // THIS ROUTE PERMITED TO LIST ALL FOLDERS AND FILES IN ROOT
 app.get('/api/drive', (req, res) => {
     drive.listFolder()
-        // On récupère le module readDirectory et on récupère le résultat de la promesse
-        /*.then(function (result) {
-            // On push le résultat de la requête et on l'envoie sur le navigateur
+        .then(function (result) {
             res.send(result)
         })
         .catch(() => {
             res.status(404)
             res.send("Error")
-        })*/
+        })
 })
 
 // THIS ROUTE DISPLAY THE CONTENT OF A FILE WHEN USER CLICK ON IT // "*" permit to open the file even if there is many folders before

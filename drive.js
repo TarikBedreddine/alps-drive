@@ -18,11 +18,11 @@ function createRootFolder() {
 
 // LIST ALL FOLDERS OF THE ROOT
 function readDirectory(pathFile = alpsDriveRoot) {
-    // Le paramètre withFileTypes permet de retourner un tableau avec des Objets et non pas un tableau avec des Strings
+    // withFileTypes permitted to return an object array instead of string array
     const promise = fs.readdir(pathFile, {withFileTypes: true})
     return promise.then((results) => {
         const allData = [];
-        // Pour chaque objet du tableau, on crée un autre objet avec 2 key (name et isDirectory)
+        // For each array object i send an object with 2 keys inside allData array
         results.forEach((oneResult) => {
             const pathJoined = path.join(pathFile, oneResult.name)
             const resultSize = fs.stat(pathJoined).then((result) => {
@@ -114,7 +114,7 @@ function uploadFile(pathBB, nameFile, folder = false) {
         })
 }
 
-// Size of a file
+// FUNCTIONS TO DISPLAY THE SIZE OF A FILE ++++ IN PROGRESS
 function transformDirentToAlpsFile(dirent) {
     return {
         name: dirent.name,
