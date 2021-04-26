@@ -1,7 +1,9 @@
 // REQUIRE ALL NECESSARY FILES & MODULES
 const drive = require('./drive')
+const fs = require('fs/promises');
 const express = require('express');
 const bb = require('express-busboy')
+
 
 //
 const app = express();
@@ -17,20 +19,21 @@ bb.extend(app, {
 // THIS ROUTE PERMITED TO LIST ALL FOLDERS AND FILES IN ROOT
 app.get('/api/drive', (req, res) => {
     drive.listFolder()
-        // On récupère le module listFolder et on récupère le résultat de la promesse
-        .then(function (result) {
+        // On récupère le module readDirectory et on récupère le résultat de la promesse
+        /*.then(function (result) {
             // On push le résultat de la requête et on l'envoie sur le navigateur
             res.send(result)
         })
         .catch(() => {
             res.status(404)
             res.send("Error")
-        })
+        })*/
 })
 
-// THIS ROUTE DISPLAY THE CONTENT OF A FILE WHEN USER CLICK ON IT
+// THIS ROUTE DISPLAY THE CONTENT OF A FILE WHEN USER CLICK ON IT // "*" permit to open the file even if there is many folders before
 app.get('/api/drive/*', (req, res) => {
     const name = req.params[0]
+
     drive.displayFile(name).then((result) => {
         res.send(result)
     }).catch(() => {
@@ -89,15 +92,14 @@ app.delete("/api/drive/:name", (req, res) => {
 
 // THIS ROUTE PERMIT TO DELETE A FOLDER OR A FILE WHICH IS INSIDE A FOLDER
 app.delete("/api/drive/*/:name", (req, res) => {
-    const regex = /^[a-zA-Z0-9-.]*$/g;
+    const regex = /^[a-zÀ-úA-Z0-9-. '’]*$/gm;
     const folder = req.params[0]
     const name = req.params.name
-    console.log(folder, name)
     const regexForName = regex.test(name)
     if (regexForName) {
         drive.deleteFileOrFolder(name, folder).then((result) => {
             res.send(result)
-        }).catch((err) => {
+        }).catch(() => {
             res.sendStatus(404)
         })
     } else {

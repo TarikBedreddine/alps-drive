@@ -17,34 +17,39 @@ function createRootFolder() {
 }
 
 // LIST ALL FOLDERS OF THE ROOT
-function listFolder(path = alpsDriveRoot) {
+function readDirectory(pathFile = alpsDriveRoot) {
     // Le paramètre withFileTypes permet de retourner un tableau avec des Objets et non pas un tableau avec des Strings
-    const promise = fs.readdir(path, {withFileTypes: true})
+    const promise = fs.readdir(pathFile, {withFileTypes: true})
     return promise.then((results) => {
         const allData = [];
         // Pour chaque objet du tableau, on crée un autre objet avec 2 key (name et isDirectory)
         results.forEach((oneResult) => {
+            const pathJoined = path.join(pathFile, oneResult.name)
+            const resultSize = fs.stat(pathJoined).then((result) => {
+                console.log(result.size)
+            })
             allData.push({
                 name: oneResult.name,
-                isFolder: oneResult.isDirectory()
+                isFolder: oneResult.isDirectory(),
+                size: resultSize
             })
         })
+        console.log(allData)
         return allData;
-    }).catch(() => {
-        console.log("error")
+    }).catch((err) => {
+        console.log("error" + err)
     })
 }
 
 // DISPLAY CONTENT IF IT'S FILE OR LIST FOLDER
 function displayFile(name) {
-    //const filePath = path.join(alpsDriveRoot, name)
     const filePath = path.join(alpsDriveRoot, name)
     const statFile = fs.stat(filePath)
     return statFile.then((result) => {
             if (result.isFile()) {
-                return fs.readFile(filePath, "utf8")
+                return fs.readFile(filePath)
             } else {
-                return listFolder(filePath)
+                return readDirectory(filePath)
             }
         }
     ).catch((err) => {console.log(err)})
@@ -109,14 +114,38 @@ function uploadFile(pathBB, nameFile, folder = false) {
         })
 }
 
+// Size of a file
+function transformDirentToAlpsFile(dirent) {
+    return {
+        name: dirent.name,
+        isFolder: true
+    }
+}
+
+function transformToAlpsResults (results) {
+    return results.map(result => {
+        if (result.isDirectory()) {
+            return transformDirentToAlpsFile(result)
+        }
+        return transformDirentToAlpsFile(result)
+    })
+}
+
+function listFolder() {
+    return readDirectory()
+        .then(dirents => transformToAlpsResults(dirents))
+        .then(pendingPromisesResults => Promise.all(pendingPromisesResults))
+}
+
 
 // Export all functions that i need
 module.exports = {
     createRootFolder: createRootFolder,
-    listFolder: listFolder,
+    readDirectory: readDirectory,
     displayFile: displayFile,
+    listFolder: listFolder,
     createFolder: createFolder,
     createFolderInsideFolder: createFolderInsideFolder,
     deleteFileOrFolder: deleteFileOrFolder,
-    uploadFile: uploadFile
+    uploadFile: uploadFile,
 };
